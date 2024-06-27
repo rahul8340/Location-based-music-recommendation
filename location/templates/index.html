@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location-based Music Recommendation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            color: #343a40;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ced4da;
+            color: #495057;
+            margin-bottom: 20px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .btn-primary {
+            background: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        #recommendations {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .recommendation {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .recommendation:last-child {
+            border-bottom: none;
+        }
+        .recommendation a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .recommendation a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center"><i class="fas fa-music"></i> Location-based Music Recommendation</h1>
+        <form id="locationForm">
+            <div class="form-group">
+                <input type="text" class="form-control" id="location" name="location" placeholder="Enter your location (city, state, country)" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-search"></i> Get Recommendations</button>
+        </form>
+        <div id="recommendations"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#locationForm').on('submit', function(event){
+                event.preventDefault();
+                var location = $('#location').val();
+                $.ajax({
+                    url: '/recommend',
+                    method: 'POST',
+                    data: { location: location },
+                    success: function(data){
+                        var recommendationsDiv = $('#recommendations');
+                        recommendationsDiv.empty();
+                        if (data.error) {
+                            recommendationsDiv.append('<p>' + data.error + '</p>');
+                        } else {
+                            data.forEach(function(track, index){
+                                recommendationsDiv.append('<div class="recommendation"><p>' + (index + 1) + '. ' + track.name + ' by ' + track.artist + ' - <a href="' + track.spotify_link + '" target="_blank">Listen on Spotify</a></p></div>');
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
